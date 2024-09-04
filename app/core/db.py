@@ -1,0 +1,46 @@
+import re
+from typing import AsyncGenerator
+
+from sqlalchemy import BigInteger, Identity, MetaData
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
+
+from app.core.config import settings
+
+
+class Base(DeclarativeBase):
+    __abstract__ = True
+
+    metadata = MetaData(
+        naming_convention={
+            'ix': 'ix_%(column_0_label)s',
+            'uq': 'uq_%(table_name)s_%(column_0_N_name)s',
+            'ck': 'ck_%(table_name)s_%(constraint_name)s',
+            'fk': 'fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s',
+            'pk': 'pk_%(table_name)s',
+        },
+    )
+
+    @declared_attr.directive
+    def __tablename__(cls):  # noqa: N805
+        name = cls.__name__
+        name = re.sub(r'([A-Z]+)(?=[A-Z][a-z]|\d|\W|$)|\B([A-Z])', r'_\1\2', name)
+        name = name.lower()
+        name = name.lstrip('_')
+        name = re.sub(r'_{2,}', '_', name)
+        return name
+
+    id: Mapped[int] = mapped_column(BigInteger, Identity(), primary_key=True)
+
+
+engine = create_async_engine(str(settings.postgres.DATABASE_URL), pool_pre_ping=True)
+
+
+AsyncSessionLocal = async_sessionmaker(
+    engine, class_=AsyncSession, expire_on_commit=False
+)
+
+
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as async_session:
+        yield async_session

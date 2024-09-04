@@ -1,0 +1,48 @@
+[tool.autoflake]
+in-place = true
+remove-all-unused-imports = true
+ignore-init-module-imports = true
+
+[tool.isort]
+profile = "black"
+skip_glob = [
+    "__pycache__/*",
+    "venv/*",
+    "alembic/*",
+    "app/core/modules/KT_model/*",
+    "app/api/endpoints/__init__.py",
+    "app/core/base.py",
+    "app/models/__init__.py",
+]
+
+[tool.black]
+line-length = 88
+skip-string-normalization = true
+
+[tool.flake8]
+max-line-length = 88
+ignore = ["F821", "W503", "E701"]
+exclude = [
+    "__pycache__/*",
+    "venv/*",
+    "alembic/*",
+    "app/core/modules/KT_model/*",
+    "app/api/endpoints/__init__.py",
+    "app/core/base.py",
+    "app/models/__init__.py",
+]
+
+[tool.ruff]
+exclude = [
+    "__pycache__/*",
+    "venv/*",
+    "alembic/*",
+    "app/core/modules/KT_model/*",
+    "app/api/endpoints/__init__.py",
+    "app/core/base.py",
+    "app/models/__init__.py",
+    "app/tests/core/modules/KT_model/adapter/test_adapter.py",
+]
+lint.select = ["E", "W", "F", "C", "N"]
+lint.ignore = ["F821"]
+line-length = 88
